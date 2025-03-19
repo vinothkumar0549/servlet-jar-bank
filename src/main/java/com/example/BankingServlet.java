@@ -17,38 +17,58 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@jakarta.servlet.annotation.WebServlet("/banking")
+//@jakarta.servlet.annotation.WebServlet("/banking")
 public class BankingServlet extends HttpServlet {
 
     Storage storage = new FileStorage();
 
     UserService userservice = new UserService(storage);
 
-    //private static final Map<String, String> sessionMap = new HashMap<>();
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         response.setContentType("application/json");
+
         PrintWriter out = response.getWriter();
         String path = request.getPathInfo();
+
         JSONObject requestBody = new JSONObject(readRequestBody(request));
         
         if ("/register".equals(path)) {
+
             out.print(registerUser(requestBody, response));
+
         } else if ("/login".equals(path)) {
+
             out.print(loginUser(requestBody, response));
+
         } else if ("/deposit".equals(path)) {
+
             out.print(deposit(requestBody, response));
+
         } else if ("/withdraw".equals(path)) {
+
             out.print(withdraw(requestBody, response));
+            
         } else if ("/moneytransfer".equals(path)) {
+
             out.print(moneytransfer(requestBody, response));
+
         } else if ("/getactivity".equals(path)){
+
             out.print(getactivity(requestBody, response));
+
         } else if("/topncustomer".equals(path)) {
+
             out.print(topncustomer(requestBody, response));
-        }else {
+
+        }// else if("/logout".equals(path)){
+        //     out.print(logout(requestBody, response));
+        // } 
+        else {
+
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             out.print(new JSONObject().put("message", "Invalid endpoint"));
+
         }
     }
 
@@ -327,8 +347,13 @@ public class BankingServlet extends HttpServlet {
 
         return responsejson.toString();
 
-
     }
+
+    // private String logout(JSONObject requestBody, HttpServletResponse response) throws IOException{
+    //     int userid = Integer.parseInt(requestBody.getString("userid"));
+    //     String password = encrypt(requestBody.getString("password"), 1);
+    //     JSONObject responsejson = new JSONObject();
+    // }
 
     private String readRequestBody(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -374,43 +399,4 @@ public class BankingServlet extends HttpServlet {
     }
 
 }
-
-
-
-// protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    //     response.setContentType("application/json");
-    //     PrintWriter out = response.getWriter();
-    //     String path = request.getPathInfo();
-        
-    //     if (path != null && path.startsWith("/topncustomer/")) {
-    //         JSONObject responsejson = new JSONObject();
-
-    //         try {
-    //             // Extract 'n' after "/topncustomer/"
-    //             String nStr = path.substring("/topncustomer/".length()); // Get only 'n'
-    //             int n = Integer.parseInt(nStr); // Convert 'n' to integer
-                
-    //             // Call method to get top N customers
-    //             List<User> topnusersbalance = userservice.getTopNCustomer(n);
-    //             responsejson.put("Users", topnusersbalance);
-    //             response.setStatus(HttpServletResponse.SC_OK);
-    //         } catch (NumberFormatException e) {
-    //             responsejson.put("error", "Invalid Number Format");
-    //             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    //         } catch (IllegalArgumentException e){
-    //             responsejson.put("error", "The Number Of Customers greate than Zero "+ e.getMessage());
-    //             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    //         } catch(RuntimeException e){
-    //             responsejson.put("error","Customer Data Not Available "+e.getMessage());
-    //             response.setStatus(HttpServletResponse.SC_CONFLICT);
-    //         } catch(Exception e){
-    //             responsejson.put("Error", "Unexpected error "+ e.getMessage());
-    //             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    //         }
-    //         out.print(responsejson.toString());
-    //     } else {
-    //         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    //         out.print(new JSONObject().put("message", "Invalid endpoint"));
-    //     }
-    // }
 
