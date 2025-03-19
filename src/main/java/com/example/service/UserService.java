@@ -58,8 +58,8 @@ public class UserService {
             throw new IllegalArgumentException("User not found");
         }
 
-        if(user.getRole()==RoleType.ADMIN){
-            throw new IllegalArgumentException("Admin Account");
+        if(user.getRole()!=RoleType.CUSTOMER){
+            throw new IllegalArgumentException("Access Denied");
         }
         
 
@@ -83,12 +83,16 @@ public class UserService {
 
     public boolean deposit(User user, int amount) {
 
-        if(amount <= 0){
-            throw new IllegalArgumentException("Invalid deposit amount");
-        }
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
+        if(user.getRole() != RoleType.CUSTOMER){
+            throw new IllegalArgumentException("Access Denied");
+        }
+        if(amount <= 0){
+            throw new IllegalArgumentException("Invalid deposit amount");
+        }
+        
         user.setBalance(user.getBalance() + amount);
         if(storage.updateUser(user)) {
             if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, new Date(), ActivityType.DEPOSIT))){
@@ -101,8 +105,12 @@ public class UserService {
     }
 
     public boolean moneytransfer(User user, int receiverid, int amount) {
+        
         if(user == null){
             throw new IllegalArgumentException("Sender user not found");
+        }
+        if(user.getRole() != RoleType.CUSTOMER){
+            throw new IllegalArgumentException("Access Denied");
         }
         if(amount <= 0){
             throw new IllegalArgumentException("Invalid transfer amount");
@@ -151,7 +159,10 @@ public class UserService {
     }
     
 
-    public List<User> getTopNCustomer(int n) {
+    public List<User> getTopNCustomer(User user, int n) {
+        if( user.getRole() != RoleType.ADMIN){
+            throw new IllegalArgumentException("Access Denied");
+        }
         if (n <= 0) {
             throw new IllegalArgumentException("The number of customers must be greater than zero");
         }

@@ -44,44 +44,9 @@ public class BankingServlet extends HttpServlet {
             out.print(moneytransfer(requestBody, response));
         } else if ("/getactivity".equals(path)){
             out.print(getactivity(requestBody, response));
-        } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            out.print(new JSONObject().put("message", "Invalid endpoint"));
-        }
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        String path = request.getPathInfo();
-        
-        if (path != null && path.startsWith("/topncustomer/")) {
-            JSONObject responsejson = new JSONObject();
-
-            try {
-                // Extract 'n' after "/topncustomer/"
-                String nStr = path.substring("/topncustomer/".length()); // Get only 'n'
-                int n = Integer.parseInt(nStr); // Convert 'n' to integer
-                
-                // Call method to get top N customers
-                List<User> topnusersbalance = userservice.getTopNCustomer(n);
-                responsejson.put("Users", topnusersbalance);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (NumberFormatException e) {
-                responsejson.put("error", "Invalid Number Format");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            } catch (IllegalArgumentException e){
-                responsejson.put("error", "The Number Of Customers greate than Zero "+ e.getMessage());
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            } catch(RuntimeException e){
-                responsejson.put("error","Customer Data Not Available "+e.getMessage());
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-            } catch(Exception e){
-                responsejson.put("Error", "Unexpected error "+ e.getMessage());
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
-            out.print(responsejson.toString());
-        } else {
+        } else if("/topncustomer".equals(path)) {
+            out.print(topncustomer(requestBody, response));
+        }else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             out.print(new JSONObject().put("message", "Invalid endpoint"));
         }
@@ -101,7 +66,7 @@ public class BankingServlet extends HttpServlet {
         }catch(Exception e){
             responsejson.put("error", " Invalid User Type: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return response.toString();
+            return responsejson.toString();
         }
         
         try{
@@ -172,19 +137,14 @@ public class BankingServlet extends HttpServlet {
 
         JSONObject responsejson = new JSONObject();
 
-        JSONObject userjson = requestBody.getJSONObject("user");
+        int userid = Integer.parseInt(requestBody.getString("userid"));
+        String password = encrypt(requestBody.getString("password"), 1);
 
-        User user = new User(
-            Integer.parseInt(userjson.getString("userid")),
-            userjson.getString("name"),
-            encrypt(userjson.getString("password"), 1),
-            RoleType.valueOf(userjson.getString("roletype").toUpperCase()),
-            Integer.parseInt(userjson.getString("accountno")),
-            Double.parseDouble(userjson.getString("balance"))
-        );
+        User user;
+
 
         try{
-            validate(user);
+            user = validate(userid, password);
         }catch(Exception e){
             responsejson.put("error", e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -222,21 +182,16 @@ public class BankingServlet extends HttpServlet {
 
         JSONObject responsejson = new JSONObject();
 
-        JSONObject userjson = requestBody.getJSONObject("user");
 
-        User user = new User(
-            Integer.parseInt(userjson.getString("userid")),
-            userjson.getString("name"),
-            encrypt(userjson.getString("password"), 1),
-            RoleType.valueOf(userjson.getString("roletype")),
-            Integer.parseInt(userjson.getString("accountno")),
-            Double.parseDouble(userjson.getString("balance"))
-        );
+        int userid = Integer.parseInt(requestBody.getString("userid"));
+        String password = encrypt(requestBody.getString("password"), 1);
 
         int amount = Integer.parseInt(requestBody.getString("amount"));
 
+        User user;
+        
         try{
-            validate(user);
+            user = validate(userid, password);
         }catch(Exception e){
             responsejson.put("error", e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -268,23 +223,15 @@ public class BankingServlet extends HttpServlet {
     
         JSONObject responsejson = new JSONObject();
 
-        JSONObject userjson = requestBody.getJSONObject("user");
-
-        User user = new User(
-            Integer.parseInt(userjson.getString("userid")),
-            userjson.getString("name"),
-            encrypt(userjson.getString("password"), 1),
-            RoleType.valueOf(userjson.getString("roletype")),
-            Integer.parseInt(userjson.getString("accountno")),
-            Double.parseDouble(userjson.getString("balance"))
-        );
-
+        int userid = Integer.parseInt(requestBody.getString("userid"));
+        String password = encrypt(requestBody.getString("password"), 1);
 
         int receiverid = Integer.parseInt(requestBody.getString("receiverid"));
         int amount = Integer.parseInt(requestBody.getString("amount"));
 
+        User user;
         try{
-            validate(user);
+            user = validate(userid, password);
         }catch(Exception e){
             responsejson.put("error", e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -316,19 +263,13 @@ public class BankingServlet extends HttpServlet {
 
         JSONObject responsejson = new JSONObject();
 
-        JSONObject userjson = requestBody.getJSONObject("user");
+        int userid = Integer.parseInt(requestBody.getString("userid"));
+        String password = encrypt(requestBody.getString("password"),1);
 
-        User user = new User(
-            Integer.parseInt(userjson.getString("userid")),
-            userjson.getString("name"),
-            encrypt(userjson.getString("password"), 1),
-            RoleType.valueOf(userjson.getString("roletype")),
-            Integer.parseInt(userjson.getString("accountno")),
-            Double.parseDouble(userjson.getString("balance"))
-        );
+        User user;
 
         try{
-            validate(user);
+            user = validate(userid, password);
         }catch(Exception e){
             responsejson.put("error", e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -351,6 +292,42 @@ public class BankingServlet extends HttpServlet {
         }
 
         return responsejson.toString();
+    }
+
+    private String topncustomer(JSONObject requestBody, HttpServletResponse response) throws IOException{
+        JSONObject responsejson = new JSONObject();
+
+        int userid = Integer.parseInt(requestBody.getString("userid"));
+        String password = encrypt(requestBody.getString("password"),1);
+        int n = Integer.parseInt(requestBody.getString("no"));
+
+        User user;
+        try{
+            user = validate(userid, password);
+        }catch(Exception e){
+            responsejson.put("error", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return responsejson.toString();
+        }
+
+        try{
+            List<User> users = userservice.getTopNCustomer(user, n);
+            responsejson.put("Users", users);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch(IllegalArgumentException e){
+            responsejson.put("error ", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch(RuntimeException e){
+            responsejson.put("error", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+        } catch(Exception e){
+            responsejson.put("error", "UnExpected Error: "+ e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
+        return responsejson.toString();
+
+
     }
 
     private String readRequestBody(HttpServletRequest request) throws IOException {
@@ -381,26 +358,59 @@ public class BankingServlet extends HttpServlet {
         return builder.toString();
     }
 
-    private void validate(User user) {
+    private User validate(int userid, String password) {
 
-        User userverify = storage.getUser(user.getUserid());
+        User user = storage.getUser(userid);
 
-        if(userverify == null){
+        if(user == null){
             throw new IllegalArgumentException("User Not Found");
         }
 
-        if(! userverify.getEncryptedpassword().equals(user.getEncryptedpassword())){
+        if(! user.getEncryptedpassword().equals(password)){
             throw new SecurityException("Invalid Password");
         }
 
-        if(!(user.getAccountno() == userverify.getAccountno() && 
-            user.getBalance() == userverify.getBalance() && 
-            user.getRole() == userverify.getRole() && 
-            user.getName().equals(userverify.getName()))){
-                throw new IllegalArgumentException();
-            }
-        return;
+        return user;
     }
 
 }
+
+
+
+// protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    //     response.setContentType("application/json");
+    //     PrintWriter out = response.getWriter();
+    //     String path = request.getPathInfo();
+        
+    //     if (path != null && path.startsWith("/topncustomer/")) {
+    //         JSONObject responsejson = new JSONObject();
+
+    //         try {
+    //             // Extract 'n' after "/topncustomer/"
+    //             String nStr = path.substring("/topncustomer/".length()); // Get only 'n'
+    //             int n = Integer.parseInt(nStr); // Convert 'n' to integer
+                
+    //             // Call method to get top N customers
+    //             List<User> topnusersbalance = userservice.getTopNCustomer(n);
+    //             responsejson.put("Users", topnusersbalance);
+    //             response.setStatus(HttpServletResponse.SC_OK);
+    //         } catch (NumberFormatException e) {
+    //             responsejson.put("error", "Invalid Number Format");
+    //             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    //         } catch (IllegalArgumentException e){
+    //             responsejson.put("error", "The Number Of Customers greate than Zero "+ e.getMessage());
+    //             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    //         } catch(RuntimeException e){
+    //             responsejson.put("error","Customer Data Not Available "+e.getMessage());
+    //             response.setStatus(HttpServletResponse.SC_CONFLICT);
+    //         } catch(Exception e){
+    //             responsejson.put("Error", "Unexpected error "+ e.getMessage());
+    //             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    //         }
+    //         out.print(responsejson.toString());
+    //     } else {
+    //         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    //         out.print(new JSONObject().put("message", "Invalid endpoint"));
+    //     }
+    // }
 
