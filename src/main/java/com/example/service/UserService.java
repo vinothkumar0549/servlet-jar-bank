@@ -54,12 +54,19 @@ public class UserService {
 
     public boolean withdraw(User user, int amount) {
 
-        if(amount <= 0){
-            throw new IllegalArgumentException("Invalid withdrawal amount");
-        }
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
+
+        if(user.getRole()==RoleType.ADMIN){
+            throw new IllegalArgumentException("Admin Account");
+        }
+        
+
+        if(amount <= 0){
+            throw new IllegalArgumentException("Invalid withdrawal amount");
+        }
+        
         if(user.getBalance() < amount) {
             throw new IllegalStateException("Insufficient balance");
         }
@@ -162,6 +169,5 @@ public class UserService {
     
         return topNBalance;
     }
-
     
 }
