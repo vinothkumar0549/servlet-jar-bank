@@ -5,7 +5,8 @@ import java.util.*;
 
 import org.json.*;
 
-import com.example.database.FileStorage;
+import com.example.database.DatabaseStorage;
+//import com.example.database.FileStorage;
 import com.example.database.Storage;
 import com.example.pojo.Activity;
 import com.example.pojo.User;
@@ -20,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 //@jakarta.servlet.annotation.WebServlet("/banking")
 public class BankingServlet extends HttpServlet {
 
-    Storage storage = new FileStorage();
+    Storage storage = new DatabaseStorage();
 
     UserService userservice = new UserService(storage);
 

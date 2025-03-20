@@ -1,51 +1,204 @@
 package com.example.database;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+
 
 import com.example.pojo.Activity;
 import com.example.pojo.User;
+import com.example.util.ActivityType;
 import com.example.util.DatabaseConnection;
+import com.example.util.RoleType;
 
-public class DatabaseStorage implements Storage{
-
-    DatabaseConnection connection = DatabaseConnection.getInstance();
+public class DatabaseStorage implements Storage {
 
     @Override
     public boolean writeUser(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'writeUser'");
+        String query = "INSERT INTO users (userid, name, encryptedpassword, role, accountno, balance) VALUES (?,?,?,?,?,?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, user.getUserid());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getEncryptedpassword());
+            preparedStatement.setString(4, String.valueOf(user.getRole())); // Assuming role is an Enum or String
+            preparedStatement.setInt(5, user.getAccountno());
+            preparedStatement.setInt(6, (int) user.getBalance()); // Store balance as double
+
+            int val = preparedStatement.executeUpdate();
+            return val != 0; // Returns true if at least one row is inserted
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return false;
     }
+
 
     @Override
     public boolean writeActivity(Activity activity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'writeActivity'");
+        String query = "INSERT INTO activity (activityid, userid, accountfrom, accountto, amount, date, activity) VALUES (?,?,?,?,?,?,?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, activity.getActivityid());
+            preparedStatement.setInt(2, activity.getUserid());
+
+            preparedStatement.setInt(3, activity.getAccountfrom());
+            
+
+            preparedStatement.setInt(4, activity.getAccountto());
+
+            preparedStatement.setInt(5, (int) activity.getAmount());
+            preparedStatement.setString(6, getTimeStamp(activity.getDate())); 
+
+            preparedStatement.setString(7, String.valueOf(activity.getActivity()));
+
+
+            int val = preparedStatement.executeUpdate();
+            return val != 0; // Returns true if at least one row is inserted
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return false;
     }
 
     @Override
     public User getUser(int userid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
+        String query = "SELECT * FROM users WHERE userid = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userid);
+            ResultSet result = preparedStatement.executeQuery();
+
+            if (result.next()) {
+                return new User(
+                result.getInt("userid"), 
+                result.getString("name"), 
+                result.getString("encryptedpassword"),
+                RoleType.valueOf(result.getString("role")),
+                result.getInt("accountno"),
+                result.getInt("balance"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return null;
     }
 
     @Override
     public boolean updateUser(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        String query = "UPDATE users SET balance = ? WHERE userid = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, (int) user.getBalance());
+            preparedStatement.setInt(2, user.getUserid());
+
+            int n = preparedStatement.executeUpdate();
+
+            return n== 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return false;
     }
 
     @Override
     public List<Activity> getActivity(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getActivity'");
+
+        List<Activity> activities = new ArrayList<>();
+
+        String query = "SELECT * FROM activity WHERE userid = ? OR accountto = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, user.getUserid());
+            preparedStatement.setInt(2, user.getAccountno());
+            ResultSet result = preparedStatement.executeQuery();
+
+            while(result.next()) {
+                Activity activity = new Activity(
+                result.getString("activityid"), 
+                result.getInt("userid"), 
+                result.getInt("accountfrom"),
+                result.getInt("accountto"),
+                result.getInt("amount"),
+                convertDate(result.getString("date")),
+                ActivityType.valueOf(result.getString("activity")));
+                activities.add(activity);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return activities;
     }
 
     @Override
     public List<User> TopNBalance(int n) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'TopNBalance'");
+
+        List<User> users = new ArrayList<>();
+
+        String query = "SELECT * FROM users WHERE role = 'CUSTOMER'  ORDER BY balance DESC LIMIT ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, n);
+
+            ResultSet result = preparedStatement.executeQuery();
+
+            while(result.next()) {
+                User user = new User(
+                    result.getInt("userid"), 
+                    result.getString("name"), 
+                    result.getString("encryptedpassword"),
+                    RoleType.valueOf(result.getString("role")),
+                    result.getInt("accountno"),
+                    result.getInt("balance"));
+
+                    users.add(user);
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print full error stack trace
+        }
+        return users;
     }
 
+    private static String getTimeStamp(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String mysqlDateTime = sdf.format(date); // Convert to MySQL format
+        return mysqlDateTime; // Example: 2025-03-19 18:07:18
+    }
 
+    private static Date convertDate(String dateTime) {
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+        try {
+            Date date = sdf.parse(dateTime); // Convert back to Date
+            return date; // Output: Wed Mar 19 18:07:18 IST 2025
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
 }
