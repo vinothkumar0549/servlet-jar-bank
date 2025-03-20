@@ -3,6 +3,7 @@ com\example\util\RoleType.class
 com\example\database\FileStorage.class
 com\example\database\Storage.class
 com\example\service\UserService.class
+com\example\BankingApplication.class
 com\example\MyServlet.class
 com\example\pojo\User.class
 com\example\BankingServlet.class

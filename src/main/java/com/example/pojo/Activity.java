@@ -87,6 +87,11 @@ public class Activity {
         return sb.toString(); 
     }
 
+    public static ActivityType valueOf(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'valueOf'");
+    }
+
 }
 
 

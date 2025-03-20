@@ -172,6 +172,11 @@ public class UserService {
         if (topNBalance == null || topNBalance.isEmpty()) {
             throw new RuntimeException("No customer data available");
         }
+
+        if(! storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.GETNCUSTOMERS))){
+            throw new RuntimeException("Activity Not Strored");
+        }
+
     
         System.out.println("Top " + n + " Customers by Balance:");
         // for (User u : topNBalance) {

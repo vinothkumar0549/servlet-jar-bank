@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
-
 import com.example.pojo.Activity;
 import com.example.pojo.User;
 import com.example.util.ActivityType;
@@ -29,15 +28,15 @@ public class DatabaseStorage implements Storage {
             preparedStatement.setInt(1, user.getUserid());
             preparedStatement.setString(2, user.getName());
             preparedStatement.setString(3, user.getEncryptedpassword());
-            preparedStatement.setString(4, String.valueOf(user.getRole())); // Assuming role is an Enum or String
+            preparedStatement.setString(4, String.valueOf(user.getRole())); 
             preparedStatement.setInt(5, user.getAccountno());
-            preparedStatement.setInt(6, (int) user.getBalance()); // Store balance as double
+            preparedStatement.setInt(6, (int) user.getBalance()); 
 
             int val = preparedStatement.executeUpdate();
-            return val != 0; // Returns true if at least one row is inserted
+            return val != 0; 
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return false;
     }
@@ -65,10 +64,10 @@ public class DatabaseStorage implements Storage {
 
 
             int val = preparedStatement.executeUpdate();
-            return val != 0; // Returns true if at least one row is inserted
+            return val != 0; 
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return false;
     }
@@ -94,7 +93,7 @@ public class DatabaseStorage implements Storage {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return null;
     }
@@ -114,7 +113,7 @@ public class DatabaseStorage implements Storage {
             return n== 1;
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return false;
     }
@@ -130,7 +129,7 @@ public class DatabaseStorage implements Storage {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, user.getUserid());
-            preparedStatement.setInt(2, user.getAccountno());
+            preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {
@@ -145,7 +144,7 @@ public class DatabaseStorage implements Storage {
                 activities.add(activity);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return activities;
     }
@@ -177,7 +176,7 @@ public class DatabaseStorage implements Storage {
                 
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Print full error stack trace
+            e.printStackTrace(); 
         }
         return users;
     }
