@@ -3,7 +3,6 @@ package com.example.controller;
 import java.io.*;
 import java.util.*;
 
-
 import org.json.*;
 
 import com.example.database.DatabaseStorage;
@@ -13,7 +12,6 @@ import com.example.pojo.Activity;
 import com.example.pojo.User;
 import com.example.service.UserService;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -25,7 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/annotation")
-public class BankingServletAnnotaion extends HttpServlet {
+public class BankingServletAnnotaion {
 
     Storage storage = new DatabaseStorage();
 

@@ -1,6 +1,7 @@
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\BankingApplication.java
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\BankingServlet.java
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\controller\BankingServletAnnotaion.java
+C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\controller\CorsFilter.java
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\database\DatabaseStorage.java
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\database\FileStorage.java
 C:\Users\Administrator\Desktop\servlet\ServletApp\src\main\java\com\example\database\Storage.java

@@ -1,0 +1,14 @@
+TransactionId                                Userid              AccountFrom         AccountTo           Amount              Date and Time                 Type
+e07c0d900e3a4101973c998a3dee02b0             9051                0                   0                   0.0                 Wed Mar 19 16:41:11 IST 2025  ACCOUNTOPEN         
+de3800b66d2f436b9d821cc9302c54f1             6873                0                   0                   10000.0             Wed Mar 19 16:41:22 IST 2025  ACCOUNTOPEN         
+fe0b1f18cb1840228f93739360d5238c             6330                0                   0                   10000.0             Wed Mar 19 16:41:29 IST 2025  ACCOUNTOPEN         
+0db62072382242868787e39a4cc3a076             9043                0                   0                   0.0                 Wed Mar 19 16:41:43 IST 2025  ACCOUNTOPEN         
+6387737d3895404783cee2d6cb07000b             9848                0                   0                   10000.0             Wed Mar 19 16:42:14 IST 2025  ACCOUNTOPEN         
+fffe8f560bc54a2eaea41d9777debfde             9051                0                   0                   0.0                 Wed Mar 19 16:43:19 IST 2025  LOGIN               
+922b0292de1543b6bf51c2a5e2ac6993             6330                0                   0                   0.0                 Wed Mar 19 16:43:41 IST 2025  LOGIN               
+ab6f71fd06b14ad2803627d85442265e             6873                687306873           0                   5555.0              Wed Mar 19 16:44:52 IST 2025  WITHDRAW            
+6f6fa79a351b44abb471fb99a1bc042a             6873                687306873           0                   555.0               Wed Mar 19 16:46:57 IST 2025  DEPOSIT             
+27c81dd83491456b8cc651760b7e2ed8             9848                984809848           633006330           2200.0              Wed Mar 19 16:48:46 IST 2025  MONEYTRANSFER       
+df7c598d89b948a8881fe8a214e759e8             9051                0                   0                   0.0                 Wed Mar 19 18:07:18 IST 2025  LOGIN               
+c6abc4e0053b46d28d0bb7c28945c915             9043                0                   0                   0.0                 Thu Mar 20 14:52:47 IST 2025  LOGIN               
+18c633ed838e435a919f01247249c643             9043                0                   0                   0.0                 Thu Mar 20 14:52:56 IST 2025  LOGOUT              
