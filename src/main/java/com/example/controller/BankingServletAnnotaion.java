@@ -102,6 +102,8 @@ public class BankingServletAnnotaion {
         int userid = Integer.parseInt(jsonObject.getString("userid"));
         String password = SecurityUtil.encrypt(jsonObject.getString("password"), 1);
 
+        int amount = Integer.parseInt(jsonObject.getString("amount"));
+
         User user = null;
 
         try{
@@ -109,9 +111,6 @@ public class BankingServletAnnotaion {
         }catch(Exception e){
             Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }
-
-        int amount = Integer.parseInt(jsonObject.getString("amount"));
-
 
         try{
             userservice.withdraw(user, amount);
@@ -317,13 +316,12 @@ public class BankingServletAnnotaion {
             throw new IllegalArgumentException("User Not Found");
         }
 
-        //SecurityUtil.validation(user.getEncryptedpassword(), password);
-
+        SecurityUtil.validation(user.getEncryptedpassword(), password);
         
 
-        if(! user.getEncryptedpassword().equals(password)){
-            throw new SecurityException("Invalid Password");
-        }
+        // if(! user.getEncryptedpassword().equals(password)){
+        //     throw new SecurityException("Invalid Password");
+        // }
 
         return user;
     }

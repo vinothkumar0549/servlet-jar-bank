@@ -132,11 +132,22 @@
   </dependency>
 
   <!--Security jar file using maven -->
-  <!-- <dependency>
+  <dependency>
     <groupId>com.example.security</groupId>
     <artifactId>security-util</artifactId>
     <version>1.0-SNAPSHOT</version>
-  </dependency> -->
+  </dependency>
+
+
+
+<!-- <dependency>
+    <groupId>com.example.security</groupId>
+    <artifactId>SecurityUtil</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/security-util-1.0-SNAPSHOT.jar</systemPath>
+</dependency> -->
+
 
 <!-- <dependency>
     <groupId>com.example.security</groupId>
@@ -145,14 +156,6 @@
     <scope>system</scope>
     <systemPath>C:/Users/Administrator/Desktop/servlet/ServletApp/src/main/webapp/WEB-INF/lib/security-util-1.0-SNAPSHOT.jar</systemPath>
 </dependency> -->
-
-<dependency>
-    <groupId>com.example.security</groupId>
-    <artifactId>SecurityUtil</artifactId>
-    <version>1.0</version>
-    <scope>system</scope>
-    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/security-util-1.0-SNAPSHOT.jar</systemPath>
-</dependency>
 
 
   </dependencies>
