@@ -1,6 +1,0 @@
-UserId              Name                EncryptPassword     Role                AccountNO           Balance
-9051                vinoth              lvnbs               ADMIN               0                   0.0                 
-6873                ramesh              sbn                 CUSTOMER            687306873           5000.0              
-6330                rajesh              sbk                 CUSTOMER            633006330           12200.0             
-9043                praveen             qsbcib              ADMIN               0                   0.0                 
-9848                akil                bsvo                CUSTOMER            984809848           7800.0              

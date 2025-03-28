@@ -3,10 +3,11 @@ package com.example.controller;
 import java.io.*;
 import java.util.*;
 
+import com.example.security.SecurityUtil;
+
 import org.json.*;
 
 import com.example.database.DatabaseStorage;
-//import com.example.database.FileStorage;
 import com.example.database.Storage;
 import com.example.pojo.Activity;
 import com.example.pojo.User;
@@ -29,7 +30,6 @@ public class BankingServletAnnotaion {
 
     UserService userservice = new UserService(storage);
 
-
     @GET
     @Path("/hello")
     @Produces(MediaType.APPLICATION_JSON)
@@ -43,7 +43,7 @@ public class BankingServletAnnotaion {
     @Produces(MediaType.APPLICATION_JSON)
     public Response registerUser(User user){
 
-        user.setEncryptedpassword(encrypt(user.getEncryptedpassword(), 1));
+        user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
 
         try{
             int userid = userservice.register(user);
@@ -69,7 +69,7 @@ public class BankingServletAnnotaion {
     public Response login(User user) {
 
         try{
-            user.setEncryptedpassword(encrypt(user.getEncryptedpassword(), 1));
+            user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
 
             User resultuser = userservice.login(user.getUserid(), user.getEncryptedpassword());
 
@@ -100,7 +100,7 @@ public class BankingServletAnnotaion {
         JSONObject jsonObject = new JSONObject(reqeustBody);
 
         int userid = Integer.parseInt(jsonObject.getString("userid"));
-        String password = encrypt(jsonObject.getString("password"), 1);
+        String password = SecurityUtil.encrypt(jsonObject.getString("password"), 1);
 
         User user = null;
 
@@ -142,7 +142,7 @@ public class BankingServletAnnotaion {
 
 
         int userid = Integer.parseInt(responsejson.getString("userid"));
-        String password = encrypt(responsejson.getString("password"), 1);
+        String password = SecurityUtil.encrypt(responsejson.getString("password"), 1);
 
         int amount = Integer.parseInt(responsejson.getString("amount"));
 
@@ -182,7 +182,7 @@ public class BankingServletAnnotaion {
         JSONObject requestjson = new JSONObject(requestBody);
 
         int userid = Integer.parseInt(requestjson.getString("userid"));
-        String password = encrypt(requestjson.getString("password"), 1);
+        String password = SecurityUtil.encrypt(requestjson.getString("password"), 1);
 
         int receiverid = Integer.parseInt(requestjson.getString("receiverid"));
         int amount = Integer.parseInt(requestjson.getString("amount"));
@@ -223,7 +223,7 @@ public class BankingServletAnnotaion {
     public Response getactivity(User user) {
 
         try{
-            user.setEncryptedpassword(encrypt(user.getEncryptedpassword(), 1));
+            user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
             user = validate(user.getUserid(), user.getEncryptedpassword());
         }catch(Exception e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -256,7 +256,7 @@ public class BankingServletAnnotaion {
         JSONObject requestjson = new JSONObject(requestBody);
 
         int userid = Integer.parseInt(requestjson.getString("userid"));
-        String password = encrypt(requestjson.getString("password"),1);
+        String password = SecurityUtil.encrypt(requestjson.getString("password"),1);
         int n = Integer.parseInt(requestjson.getString("no"));
 
         User user;
@@ -291,23 +291,23 @@ public class BankingServletAnnotaion {
     // }
 
 
-    public static String encrypt(String password, int shift) {
+    // public static String encrypt(String password, int shift) {
 
-        StringBuilder builder = new StringBuilder();
+    //     StringBuilder builder = new StringBuilder();
 
-        for (char c : password.toCharArray()) {
+    //     for (char c : password.toCharArray()) {
 
-            if (Character.isLetterOrDigit(c)) {
+    //         if (Character.isLetterOrDigit(c)) {
 
-                char base = Character.isUpperCase(c) ? 'A' : (Character.isLowerCase(c) ? 'a' : '0');
-                int range = Character.isDigit(c) ? 10 : 26; 
-                builder.append((char) (base + (c - base + shift) % range));
-            } else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
+    //             char base = Character.isUpperCase(c) ? 'A' : (Character.isLowerCase(c) ? 'a' : '0');
+    //             int range = Character.isDigit(c) ? 10 : 26; 
+    //             builder.append((char) (base + (c - base + shift) % range));
+    //         } else {
+    //             builder.append(c);
+    //         }
+    //     }
+    //     return builder.toString();
+    // }
 
     private User validate(int userid, String password) {
 
@@ -316,6 +316,10 @@ public class BankingServletAnnotaion {
         if(user == null){
             throw new IllegalArgumentException("User Not Found");
         }
+
+        //SecurityUtil.validation(user.getEncryptedpassword(), password);
+
+        
 
         if(! user.getEncryptedpassword().equals(password)){
             throw new SecurityException("Invalid Password");
