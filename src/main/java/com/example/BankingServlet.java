@@ -11,7 +11,7 @@ import com.example.database.Storage;
 import com.example.pojo.Activity;
 import com.example.pojo.User;
 import com.example.service.UserService;
-import com.example.util.RoleType;
+import com.example.pojo.RoleType;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

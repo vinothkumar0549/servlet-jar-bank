@@ -12,7 +12,6 @@ import com.example.database.Storage;
 import com.example.pojo.Activity;
 import com.example.pojo.User;
 import com.example.service.UserService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -104,12 +103,12 @@ public class BankingServletAnnotaion {
 
         int amount = Integer.parseInt(jsonObject.getString("amount"));
 
-        User user = null;
+        User user;
 
         try{
             user = validate(userid, password);
         }catch(Exception e){
-            Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }
 
         try{
@@ -312,12 +311,13 @@ public class BankingServletAnnotaion {
 
         User user = storage.getUser(userid);
 
-        if(user == null){
-            throw new IllegalArgumentException("User Not Found");
-        }
-
-        SecurityUtil.validation(user.getEncryptedpassword(), password);
         
+
+        SecurityUtil.validation(user, password);
+        
+        // if(user == null){
+        //     throw new IllegalArgumentException("User Not Found");
+        // }
 
         // if(! user.getEncryptedpassword().equals(password)){
         //     throw new SecurityException("Invalid Password");

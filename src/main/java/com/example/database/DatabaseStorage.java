@@ -14,7 +14,7 @@ import com.example.pojo.Activity;
 import com.example.pojo.User;
 import com.example.util.ActivityType;
 import com.example.util.DatabaseConnection;
-import com.example.util.RoleType;
+import com.example.pojo.RoleType;
 
 public class DatabaseStorage implements Storage {
 

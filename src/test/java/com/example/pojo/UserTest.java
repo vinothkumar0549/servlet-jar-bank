@@ -2,7 +2,7 @@ package com.example.pojo;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import com.example.util.RoleType;
+//import com.example.pojo.RoleType;
 
 class UserTest {
 

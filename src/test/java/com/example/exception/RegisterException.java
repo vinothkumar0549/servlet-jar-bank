@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import com.example.database.Storage;
 import com.example.pojo.User;
 import com.example.service.*;
-import com.example.util.RoleType;
+import com.example.pojo.RoleType;
 
 class RegisterException {
 

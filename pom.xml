@@ -131,7 +131,7 @@
     <version>5.0.0</version>
   </dependency>
 
-  <!--Security jar file using maven -->
+  <!--Security jar file using maven repository -->
   <dependency>
     <groupId>com.example.security</groupId>
     <artifactId>security-util</artifactId>
@@ -139,14 +139,14 @@
   </dependency>
 
 
-
-<!-- <dependency>
-    <groupId>com.example.security</groupId>
-    <artifactId>SecurityUtil</artifactId>
-    <version>1.0</version>
+<!-- user jar from local system -->
+<dependency>
+    <groupId>com.example.pojo</groupId>
+    <artifactId>user</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/security-util-1.0-SNAPSHOT.jar</systemPath>
-</dependency> -->
+    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/user-1.0-SNAPSHOT.jar</systemPath>
+</dependency>
 
 
 <!-- <dependency>
