@@ -2,6 +2,7 @@ package com.example.pojo;
 
 import java.util.Date;
 import com.example.util.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Activity {
 
@@ -10,6 +11,8 @@ public class Activity {
     private int accountfrom;
     private int accountto;
     private double amount;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date date;
     private ActivityType activity;
 

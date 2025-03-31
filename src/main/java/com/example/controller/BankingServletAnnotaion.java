@@ -71,7 +71,7 @@ public class BankingServletAnnotaion {
             user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
 
             User resultuser = userservice.login(user.getUserid(), user.getEncryptedpassword());
-
+            resultuser.setEncryptedpassword(decrypt(resultuser.getEncryptedpassword(), 1));
             return Response.status(Response.Status.OK).entity(resultuser).build();
 
         }catch(IllegalArgumentException e){
@@ -113,7 +113,7 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.withdraw(user, amount);
-            return Response.status(Response.Status.OK).entity("{ message : withdraw Successfully }").build();
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -155,7 +155,7 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.deposit(user, amount);
-            return Response.status(Response.Status.OK).entity("{ message : Deposit Successfully }").build();
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -195,7 +195,7 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.moneytransfer(user, receiverid, amount);
-            return Response.status(Response.Status.OK).entity("{ message : Money Transfered Successfully }").build();
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -230,7 +230,7 @@ public class BankingServletAnnotaion {
 
         try{
             List<Activity> activities = userservice.printActivity(user);
-            return Response.status(Response.Status.OK).entity("{ \"Activity\": \"" + activities + "\", \"message\": \"success\" }").build();
+            return Response.status(Response.Status.OK).entity(Map.of("Activity", activities)).build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -246,7 +246,7 @@ public class BankingServletAnnotaion {
     }
 
     @POST
-    @Path("/topnucustomer")
+    @Path("/topncustomer")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response topncustomer(String requestBody, @Context HttpServletRequest request) {
@@ -267,7 +267,7 @@ public class BankingServletAnnotaion {
 
         try{
             List<User> users = userservice.getTopNCustomer(user, n);
-            return Response.status(Response.Status.OK).entity("{ \"Users\": \"" + users + "\", \"message\": \"success\" }").build();
+            return Response.status(Response.Status.OK).entity(Map.of("Users", users)).build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -306,6 +306,22 @@ public class BankingServletAnnotaion {
     //     }
     //     return builder.toString();
     // }
+
+    public static String decrypt(String encryptedPassword, int shift) {
+        StringBuilder builder = new StringBuilder();
+    
+        for (char c : encryptedPassword.toCharArray()) {
+            if (Character.isLetterOrDigit(c)) {
+                char base = Character.isUpperCase(c) ? 'A' : (Character.isLowerCase(c) ? 'a' : '0');
+                int range = Character.isDigit(c) ? 10 : 26;
+                builder.append((char) (base + (c - base - shift + range) % range));
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
+    
 
     private User validate(int userid, String password) {
 
