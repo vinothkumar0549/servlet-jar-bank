@@ -14,7 +14,6 @@ import java.util.PriorityQueue;
 
 import com.example.pojo.*;
 import com.example.util.*;
-import com.mysql.cj.log.Log;
 
 public class FileStorage implements Storage {
     private final static String userpath = "C:/Users/Administrator/Desktop/servlet/ServletApp/src/main/java/com/example/files/user.txt";
