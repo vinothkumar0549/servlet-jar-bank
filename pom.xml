@@ -92,24 +92,10 @@
       <version>3.1.2</version>
   </dependency>
 
-  <!-- Jersey Servlet (For integrating Jersey with Tomcat & Servlets) -->
-  <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-servlet</artifactId>
-      <version>3.1.2</version>
-  </dependency>
-
   <!-- Jackson JSON Support for Serialization/Deserialization -->
   <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>3.1.2</version>
-  </dependency>
-
-  <!-- Jersey HK2 Dependency Injection (for automatic object management) -->
-  <dependency>
-      <groupId>org.glassfish.jersey.inject</groupId>
-      <artifactId>jersey-hk2</artifactId>
       <version>3.1.2</version>
   </dependency>
 
