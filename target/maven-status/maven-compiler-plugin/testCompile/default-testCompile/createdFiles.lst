@@ -1,4 +1,2 @@
-com\example\pojo\UserTest.class
-com\example\service\UserServiceTest.class
 com\example\exception\RegisterException.class
 com\example\pojo\ActivityTest.class

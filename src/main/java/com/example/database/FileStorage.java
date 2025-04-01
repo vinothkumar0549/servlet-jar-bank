@@ -14,6 +14,7 @@ import java.util.PriorityQueue;
 
 import com.example.pojo.*;
 import com.example.util.*;
+import com.mysql.cj.log.Log;
 
 public class FileStorage implements Storage {
     private final static String userpath = "C:/Users/Administrator/Desktop/servlet/ServletApp/src/main/java/com/example/files/user.txt";
@@ -55,7 +56,7 @@ public class FileStorage implements Storage {
             while ((line = bufferedReader.readLine()) != null) { 
                 if(line.startsWith(String.valueOf(userid))){
                     String[] userdata = line.split("\\s+");
-                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]));
+                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), userdata[6],userdata[7]);
                     return user;
                 }
             }
@@ -139,7 +140,7 @@ public class FileStorage implements Storage {
             String line;
             while ((line = bufferedreader.readLine()) != null) {
                 String[] userdata = line.split("\\s+");
-                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]));
+                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), userdata[6], userdata[7]);
     
                 if (user.getRole() == RoleType.ADMIN) {
                     continue;

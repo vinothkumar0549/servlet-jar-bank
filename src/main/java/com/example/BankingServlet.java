@@ -76,6 +76,8 @@ public class BankingServlet extends HttpServlet {
     private String registerUser(JSONObject requestBody, HttpServletResponse response) throws IOException {
         String name = requestBody.getString("name");
         String password = encrypt(requestBody.getString("password"), 1);
+        String mobilenumber = requestBody.getString("mobilenumber");
+        String aadhaar = requestBody.getString("aadhaar");
         RoleType usertype = null;
         //String retypepassword = requestBody.getString("retypepassword");
         
@@ -91,7 +93,7 @@ public class BankingServlet extends HttpServlet {
         }
         
         try{
-            int userid = userservice.register(new User(name, password, usertype));
+            int userid = userservice.register(new User(name, password, usertype, mobilenumber, aadhaar));
             responsejson.put("UserId", userid);
             responsejson.put("message", "User registered successfully");
             response.setStatus(HttpServletResponse.SC_CREATED);

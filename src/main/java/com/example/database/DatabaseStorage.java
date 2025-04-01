@@ -20,7 +20,7 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean writeUser(User user) {
-        String query = "INSERT INTO users (userid, name, encryptedpassword, role, accountno, balance) VALUES (?,?,?,?,?,?)";
+        String query = "INSERT INTO users (userid, name, encryptedpassword, role, accountno, balance, mobilenumber, aadhaar) VALUES (?,?,?,?,?,?,?,?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -30,7 +30,9 @@ public class DatabaseStorage implements Storage {
             preparedStatement.setString(3, user.getEncryptedpassword());
             preparedStatement.setString(4, String.valueOf(user.getRole())); 
             preparedStatement.setInt(5, user.getAccountno());
-            preparedStatement.setInt(6, (int) user.getBalance()); 
+            preparedStatement.setInt(6, (int) user.getBalance());
+            preparedStatement.setLong(7, Long.parseLong(user.getMobilenumber())); 
+            preparedStatement.setLong(8, Long.parseLong(user.getAadhaar()));
 
             int val = preparedStatement.executeUpdate();
             return val != 0; 
@@ -89,7 +91,9 @@ public class DatabaseStorage implements Storage {
                 result.getString("encryptedpassword"),
                 RoleType.valueOf(result.getString("role")),
                 result.getInt("accountno"),
-                result.getInt("balance"));
+                result.getInt("balance"),
+                String.valueOf(result.getLong("mobilenumber")),
+                String.valueOf(result.getLong("Aadhaar")));
             }
 
         } catch (SQLException e) {
@@ -170,7 +174,9 @@ public class DatabaseStorage implements Storage {
                     result.getString("encryptedpassword"),
                     RoleType.valueOf(result.getString("role")),
                     result.getInt("accountno"),
-                    result.getInt("balance"));
+                    result.getInt("balance"),
+                    String.valueOf(result.getLong("mobilenumber")),
+                    String.valueOf(result.getLong("aadhaar")));
 
                     users.add(user);
                 

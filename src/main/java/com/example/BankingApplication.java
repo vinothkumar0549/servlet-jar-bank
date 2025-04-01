@@ -245,6 +245,12 @@ public class BankingApplication {
         System.out.println("Enter the Re-Type Password: ");
         String retypepassword = scanner.nextLine();
 
+        System.out.println("Enter the Mobile Number:");
+        String mobilenumber = scanner.nextLine();
+
+        System.out.println("Enter the Aadhaar Number: ");
+        String aadhaar = scanner.nextLine();
+
         if(! password.equals(retypepassword)) {
             System.out.println("Enter the Same Password....");
             return 0;
@@ -257,7 +263,7 @@ public class BankingApplication {
             RoleType roletype = RoleType.valueOf(role.toUpperCase());
 
             if ((roletype == RoleType.ADMIN) || (roletype == RoleType.CUSTOMER)) {
-                return userservice.register(new User(name, encryptpassword(password, 1), roletype));                    
+                return userservice.register(new User(name, encryptpassword(password, 1), roletype, mobilenumber, aadhaar));                    
                 
             }
 
