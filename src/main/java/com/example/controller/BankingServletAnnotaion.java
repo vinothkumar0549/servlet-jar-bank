@@ -71,7 +71,7 @@ public class BankingServletAnnotaion {
             user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
 
             User resultuser = userservice.login(user.getUserid(), user.getEncryptedpassword());
-            resultuser.setEncryptedpassword(decrypt(resultuser.getEncryptedpassword(), 1));
+            resultuser.setEncryptedpassword(SecurityUtil.decrypt(resultuser.getEncryptedpassword(), 1));
             return Response.status(Response.Status.OK).entity(resultuser).build();
 
         }catch(IllegalArgumentException e){
@@ -282,11 +282,23 @@ public class BankingServletAnnotaion {
 
     }
 
-    // private String logout(JSONObject requestBody, HttpServletResponse response) throws IOException{
-    //     int userid = Integer.parseInt(requestBody.getString("userid"));
-    //     String password = encrypt(requestBody.getString("password"), 1);
-    //     JSONObject responsejson = new JSONObject();
-    // }
+    @POST
+    @Path("/logout")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logout(User user){
+        try {
+            userservice.logout(user);
+            return Response.status(Response.Status.OK).build();
+
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
+    }
 
 
     // public static String encrypt(String password, int shift) {
@@ -307,20 +319,20 @@ public class BankingServletAnnotaion {
     //     return builder.toString();
     // }
 
-    public static String decrypt(String encryptedPassword, int shift) {
-        StringBuilder builder = new StringBuilder();
+    // public static String decrypt(String encryptedPassword, int shift) {
+    //     StringBuilder builder = new StringBuilder();
     
-        for (char c : encryptedPassword.toCharArray()) {
-            if (Character.isLetterOrDigit(c)) {
-                char base = Character.isUpperCase(c) ? 'A' : (Character.isLowerCase(c) ? 'a' : '0');
-                int range = Character.isDigit(c) ? 10 : 26;
-                builder.append((char) (base + (c - base - shift + range) % range));
-            } else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
+    //     for (char c : encryptedPassword.toCharArray()) {
+    //         if (Character.isLetterOrDigit(c)) {
+    //             char base = Character.isUpperCase(c) ? 'A' : (Character.isLowerCase(c) ? 'a' : '0');
+    //             int range = Character.isDigit(c) ? 10 : 26;
+    //             builder.append((char) (base + (c - base - shift + range) % range));
+    //         } else {
+    //             builder.append(c);
+    //         }
+    //     }
+    //     return builder.toString();
+    // }
     
 
     private User validate(int userid, String password) {

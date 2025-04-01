@@ -26,7 +26,7 @@ public class UserService {
             user.setBalance(10000.00);
         }
         if(storage.writeUser(user)){
-            System.out.println("Write");
+            //System.out.println("Write");
             Activity activity = new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, user.getBalance(), new Date(), ActivityType.ACCOUNTOPEN);
             if(storage.writeActivity(activity)){
                 return user.getUserid();
@@ -178,7 +178,7 @@ public class UserService {
         }
 
     
-        System.out.println("Top " + n + " Customers by Balance:");
+        //System.out.println("Top " + n + " Customers by Balance:");
         // for (User u : topNBalance) {
         //     System.out.println(u.toString());
         // }
