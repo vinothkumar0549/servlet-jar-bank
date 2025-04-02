@@ -123,17 +123,54 @@ public class DatabaseStorage implements Storage {
     }
 
     @Override
-    public List<Activity> getActivity(User user) {
+    public List<Activity> getTransaction(User user) {
 
         List<Activity> activities = new ArrayList<>();
 
-        String query = "SELECT * FROM activity WHERE userid = ? OR accountto = ?";
+        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?) ";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, user.getUserid());
             preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
+            preparedStatement.setString(3, "WITHDRAW");
+            preparedStatement.setString(4, "DEPOSIT");
+            preparedStatement.setString(5, "MONEYTRANSFER");
+            ResultSet result = preparedStatement.executeQuery();
+
+            while(result.next()) {
+                Activity activity = new Activity(
+                result.getString("activityid"), 
+                result.getInt("userid"), 
+                result.getInt("accountfrom"),
+                result.getInt("accountto"),
+                result.getInt("amount"),
+                convertDate(result.getString("date")),
+                ActivityType.valueOf(result.getString("activity")));
+                activities.add(activity);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return activities;
+    }
+
+    @Override
+    public List<Activity> getActivity(User user) {
+
+        List<Activity> activities = new ArrayList<>();
+
+        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?) ";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, user.getUserid());
+            preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
+            preparedStatement.setString(3, "LOGIN");
+            preparedStatement.setString(4, "LOGOUT");
+            preparedStatement.setString(5, "GETNCUSTOMERS");
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {

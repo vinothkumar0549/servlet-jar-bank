@@ -90,7 +90,7 @@ public class FileStorage implements Storage {
     public List<Activity> getActivity(User user) {
 
         List<Activity> activities = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss");
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(activitypath))) {
             bufferedReader.readLine();
@@ -162,6 +162,12 @@ public class FileStorage implements Storage {
         
         return topnbalance;
 
+    }
+
+    @Override
+    public List<Activity> getTransaction(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTransaction'");
     }
     
 }

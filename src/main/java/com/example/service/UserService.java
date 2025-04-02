@@ -140,6 +140,24 @@ public class UserService {
         throw new IllegalArgumentException("Invalid user for logout");
     }
 
+    public List<Activity> printTransaction(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+    
+        List<Activity> transactions = storage.getTransaction(user);
+
+        if (transactions == null || transactions.isEmpty()) {
+            throw new RuntimeException("No activity data available for the user");
+        }
+    
+        // for (Activity activity : activities) {
+        //     System.out.println(activity.toString());
+        // }
+    
+        return transactions;
+    }
+
     public List<Activity> printActivity(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");

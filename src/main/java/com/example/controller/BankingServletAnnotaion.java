@@ -215,6 +215,37 @@ public class BankingServletAnnotaion {
     }
     
     @POST
+    @Path("/gettransaction")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response gettransaction(User user) {
+
+        try{
+            user.setEncryptedpassword(SecurityUtil.encrypt(user.getEncryptedpassword(), 1));
+            user = validate(user.getUserid(), user.getEncryptedpassword());
+        }catch(Exception e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
+
+        try{
+            List<Activity> activities = userservice.printTransaction(user);
+            return Response.status(Response.Status.OK).entity(Map.of("Activity", activities)).build();
+
+        } catch(IllegalArgumentException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(RuntimeException e){
+            return Response.status(Response.Status.CONFLICT).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
+
+    }
+
+    @POST
     @Path("/getactivity")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

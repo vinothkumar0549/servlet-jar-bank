@@ -14,6 +14,8 @@ public interface Storage {
 
     public boolean updateUser(User user);
 
+    public List<Activity> getTransaction(User user);
+
     public List<Activity> getActivity(User user);
 
     public List<User> TopNBalance(int n);

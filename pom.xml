@@ -126,7 +126,7 @@
 <dependency>
     <groupId>com.example.security</groupId>
     <artifactId>security-util</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 </dependency>
     <!-- <scope>system</scope>
     <systemPath>C:/Users/Administrator/Desktop/SecurityUitljar/security-util/target/security-util-1.0-SNAPSHOT.jar</systemPath> -->
@@ -135,7 +135,7 @@
 <dependency>
     <groupId>com.example.pojo</groupId>
     <artifactId>user</artifactId>
-    <version>1.0-SNAPSHOT</version>  
+    <version>1.0</version>  
 </dependency>
 <!-- <scope>system</scope>
     <systemPath>C:/Users/Administrator/Desktop/userjar/user/target/user-1.0-SNAPSHOT.jar</systemPath> -->
