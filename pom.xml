@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>ServletApp</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>ServletApp Maven Webapp</name>
   <url>http://maven.apache.org</url>
@@ -16,7 +16,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.json</groupId>
+      <groupId>org.json</groupId>    
       <artifactId>json</artifactId>
       <version>20210307</version>
     </dependency>
@@ -118,21 +118,27 @@
   </dependency>
 
   <!--Security jar file using maven repository -->
-  <dependency>
+  <!-- <dependency>
     <groupId>com.example.security</groupId>
     <artifactId>security-util</artifactId>
     <version>1.0-SNAPSHOT</version>
-  </dependency>
-
+  </dependency> -->
+<dependency>
+    <groupId>com.example.security</groupId>
+    <artifactId>security-util</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+    <!-- <scope>system</scope>
+    <systemPath>C:/Users/Administrator/Desktop/SecurityUitljar/security-util/target/security-util-1.0-SNAPSHOT.jar</systemPath> -->
 
 <!-- user jar from local system -->
 <dependency>
     <groupId>com.example.pojo</groupId>
     <artifactId>user</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <scope>system</scope>
-    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/user-1.0-SNAPSHOT.jar</systemPath>
+    <version>1.0-SNAPSHOT</version>  
 </dependency>
+<!-- <scope>system</scope>
+    <systemPath>C:/Users/Administrator/Desktop/userjar/user/target/user-1.0-SNAPSHOT.jar</systemPath> -->
 
 
 <!-- <dependency>
@@ -144,8 +150,107 @@
 </dependency> -->
 
 
+
+    
+    <!-- Jersey Core -->
+    <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>3.0.8</version>
+    </dependency>
+
+    <!-- Jersey Servlet -->
+    <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>3.0.8</version>
+    </dependency>
+
+    <!-- Jakarta Servlet API -->
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>5.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+
+    <!-- Jetty Server (Embedded) -->
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>11.0.14</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>11.0.14</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>11.0.14</version>
+    </dependency>
+
+    <dependency>
+    <groupId>org.glassfish.jersey.core</groupId>
+    <artifactId>jersey-common</artifactId>
+    <version>3.1.2</version>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.jersey.containers</groupId>
+    <artifactId>jersey-container-servlet</artifactId>
+    <version>3.1.2</version>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.jersey.inject</groupId>
+    <artifactId>jersey-hk2</artifactId>
+    <version>3.1.2</version>
+</dependency>
+
+
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.4.14</version>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.jaxb</groupId>
+    <artifactId>jaxb-runtime</artifactId>
+    <version>4.0.4</version>
+</dependency>
+
+
   </dependencies>
-  <build>
-    <finalName>ServletApp</finalName>
-  </build>
+<build>
+<finalName>ServletApp</finalName>
+    <plugins>
+        <!-- Maven Shade Plugin for a Fat JAR -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                    <includes>
+                    <include>com/example/**</include>
+                </includes>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>com.example.Main</mainClass> <!-- Update with your Main class -->
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+
 </project>
