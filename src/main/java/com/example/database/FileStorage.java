@@ -169,5 +169,11 @@ public class FileStorage implements Storage {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getTransaction'");
     }
+
+    @Override
+    public boolean updateProfile(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateProfile'");
+    }
     
 }

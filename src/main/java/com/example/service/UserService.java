@@ -148,7 +148,7 @@ public class UserService {
         List<Activity> transactions = storage.getTransaction(user);
 
         if (transactions == null || transactions.isEmpty()) {
-            throw new RuntimeException("No activity data available for the user");
+            throw new RuntimeException("No Transaction data available for the user");
         }
     
         // for (Activity activity : activities) {
@@ -174,6 +174,30 @@ public class UserService {
         // }
     
         return activities;
+    }
+
+    public boolean updateProfile(User user, User updateuser) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be Found");
+        }
+
+        // Update only the changed fields
+        if (updateuser.getMobilenumber() != null) {
+            user.setMobilenumber(updateuser.getMobilenumber());
+        }
+        if (updateuser.getAadhaar() != null) {
+            user.setAadhaar(updateuser.getAadhaar());
+        }
+
+        // Save updated user back to storage
+        if(storage.updateProfile(user)){
+            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.UPDATEPROFILE));
+            return true;
+        }
+        throw new RuntimeException("Failed to update user balances");
+
+        
     }
     
 

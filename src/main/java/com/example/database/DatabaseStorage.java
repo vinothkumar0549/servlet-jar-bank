@@ -123,6 +123,27 @@ public class DatabaseStorage implements Storage {
     }
 
     @Override
+    public boolean updateProfile(User user) {
+        String query = "UPDATE users SET mobilenumber = ?, aadhaar = ? WHERE userid = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setLong(1, Long.parseLong(user.getMobilenumber()));
+            preparedStatement.setLong(2, Long.parseLong(user.getAadhaar()));
+            preparedStatement.setInt(3, user.getUserid());
+
+            int n = preparedStatement.executeUpdate();
+
+            return n== 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return false;
+    }
+
+    @Override
     public List<Activity> getTransaction(User user) {
 
         List<Activity> activities = new ArrayList<>();
@@ -161,16 +182,17 @@ public class DatabaseStorage implements Storage {
 
         List<Activity> activities = new ArrayList<>();
 
-        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?) ";
+        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?, ?) ";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, user.getUserid());
             preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
-            preparedStatement.setString(3, "LOGIN");
-            preparedStatement.setString(4, "LOGOUT");
-            preparedStatement.setString(5, "GETNCUSTOMERS");
+            preparedStatement.setString(3, "ACCOUNTOPEN");
+            preparedStatement.setString(4, "LOGIN");
+            preparedStatement.setString(5, "LOGOUT");
+            preparedStatement.setString(6, "GETNCUSTOMERS");
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {

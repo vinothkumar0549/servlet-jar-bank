@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
@@ -275,6 +276,44 @@ public class BankingServletAnnotaion {
         }
 
     }
+
+
+    @PUT
+    @Path("/updateprofile")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateProfile(User updateuser) {
+        User user;
+        try{
+            updateuser.setEncryptedpassword(SecurityUtil.encrypt(updateuser.getEncryptedpassword(), 1));
+            user = validate(updateuser.getUserid(), updateuser.getEncryptedpassword());
+        }catch(Exception e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
+
+        try{
+            userservice.updateProfile(user, updateuser);
+            return Response.status(Response.Status.OK).entity(user).build();
+
+        } catch(IllegalArgumentException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(IllegalStateException e){
+            return Response.status(Response.Status.CONFLICT).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(RuntimeException e){
+            return Response.status(Response.Status.CONFLICT).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
+        
+    }
+
+
+
 
     @POST
     @Path("/topncustomer")

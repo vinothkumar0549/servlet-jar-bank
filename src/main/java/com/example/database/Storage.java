@@ -19,5 +19,7 @@ public interface Storage {
     public List<Activity> getActivity(User user);
 
     public List<User> TopNBalance(int n);
+
+    public boolean updateProfile(User user);
     
 }
