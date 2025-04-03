@@ -182,7 +182,7 @@ public class DatabaseStorage implements Storage {
 
         List<Activity> activities = new ArrayList<>();
 
-        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?, ?) ";
+        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?, ?, ?) ";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -193,6 +193,7 @@ public class DatabaseStorage implements Storage {
             preparedStatement.setString(4, "LOGIN");
             preparedStatement.setString(5, "LOGOUT");
             preparedStatement.setString(6, "GETNCUSTOMERS");
+            preparedStatement.setString(7, "UPDATEPROFILE");
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {
