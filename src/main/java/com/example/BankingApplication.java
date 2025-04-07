@@ -246,10 +246,10 @@ public class BankingApplication {
         String retypepassword = scanner.nextLine();
 
         System.out.println("Enter the Mobile Number:");
-        String mobilenumber = scanner.nextLine();
+        long mobilenumber = Long.parseLong(scanner.nextLine());  // Safe way
 
         System.out.println("Enter the Aadhaar Number: ");
-        String aadhaar = scanner.nextLine();
+        long aadhaar = Long.parseLong(scanner.nextLine());  // Safe way
 
         if(! password.equals(retypepassword)) {
             System.out.println("Enter the Same Password....");

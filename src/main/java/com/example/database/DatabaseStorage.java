@@ -20,22 +20,33 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean writeUser(User user) {
-        String query = "INSERT INTO users (userid, name, encryptedpassword, role, accountno, balance, mobilenumber, aadhaar) VALUES (?,?,?,?,?,?,?,?)";
+        //String query = "INSERT INTO users (userid, name, encryptedpassword, role, accountno, balance, mobilenumber, aadhaar) VALUES (?,?,?,?,?,?,?,?)";
+
+        String insertuser = "INSERT INTO userdetails (userid, encryptedpassword, name, role, mobilenumber, aadhaar) VALUES (?,?,?,?,?,?)";
+        String insertcustomer = "INSERT INTO accountdetails (accountno, userid, balance) VALUES (?,?,?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatementuser = connection.prepareStatement(insertuser);
+             PreparedStatement preparedStatementcustomer = connection.prepareStatement(insertcustomer)) {
 
-            preparedStatement.setInt(1, user.getUserid());
-            preparedStatement.setString(2, user.getName());
-            preparedStatement.setString(3, user.getEncryptedpassword());
-            preparedStatement.setString(4, String.valueOf(user.getRole())); 
-            preparedStatement.setInt(5, user.getAccountno());
-            preparedStatement.setInt(6, (int) user.getBalance());
-            preparedStatement.setLong(7, Long.parseLong(user.getMobilenumber())); 
-            preparedStatement.setLong(8, Long.parseLong(user.getAadhaar()));
+            preparedStatementuser.setInt(1, user.getUserid());
+            preparedStatementuser.setString(2, user.getEncryptedpassword());
+            preparedStatementuser.setString(3, user.getName());
+            preparedStatementuser.setString(4, user.getRole().name()); // for "ADMIN"
+            preparedStatementuser.setLong(5, user.getMobilenumber()); 
+            preparedStatementuser.setLong(6, user.getAadhaar());
 
-            int val = preparedStatement.executeUpdate();
-            return val != 0; 
+            int val = preparedStatementuser.executeUpdate();
+
+            if(user.getRole() == RoleType.CUSTOMER){
+                preparedStatementcustomer.setInt(1, user.getAccountno());
+                preparedStatementcustomer.setInt(2, user.getUserid());
+                preparedStatementcustomer.setInt(3, (int) user.getBalance());
+
+                preparedStatementcustomer.executeUpdate();
+            }
+
+            return val != 0;
 
         } catch (SQLException e) {
             e.printStackTrace(); 
@@ -46,27 +57,68 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean writeActivity(Activity activity) {
-        String query = "INSERT INTO activity (activityid, userid, accountfrom, accountto, amount, date, activity) VALUES (?,?,?,?,?,?,?)";
-
+        System.out.println(activity.toString());
+        String activityquery = "INSERT INTO activitydetails (activityid, userid, date, activity) VALUES (?,?,?,?)";
         try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, activity.getActivityid());
-            preparedStatement.setInt(2, activity.getUserid());
-
-            preparedStatement.setInt(3, activity.getAccountfrom());
+            PreparedStatement preparedStatementactivity = connection.prepareStatement(activityquery);) {
             
 
-            preparedStatement.setInt(4, activity.getAccountto());
+            if(activity.getActivity() == ActivityType.ACCOUNTOPEN || 
+              activity.getActivity() == ActivityType.LOGIN || 
+              activity.getActivity() == ActivityType.LOGOUT ||
+              activity.getActivity() == ActivityType.GETNCUSTOMERS ||
+              activity.getActivity() == ActivityType.UPDATEPROFILE){
 
-            preparedStatement.setInt(5, (int) activity.getAmount());
-            preparedStatement.setString(6, getTimeStamp(activity.getDate())); 
+                preparedStatementactivity.setString(1, activity.getActivityid());
+                preparedStatementactivity.setInt(2, activity.getUserid());
 
-            preparedStatement.setString(7, String.valueOf(activity.getActivity()));
+            
+                preparedStatementactivity.setTimestamp(3, activity.getDate()); 
+                preparedStatementactivity.setString(4, activity.getActivity().name());
 
 
-            int val = preparedStatement.executeUpdate();
-            return val != 0; 
+                int val = preparedStatementactivity.executeUpdate();
+                return val != 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return false;
+    }
+
+    @Override
+    public boolean writeTransaction(Activity activity) {
+        String activityquery = "INSERT INTO transactiondetails (transactionid, accountfrom, accountto, amount, date, transaction) VALUES (?,?,?,?,?,?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatementtransaction = connection.prepareStatement(activityquery);) {
+            System.out.println("\n\n\n\n\n\n"+activity.toString());
+
+            if(activity.getActivity() == ActivityType.WITHDRAW || 
+              activity.getActivity() == ActivityType.DEPOSIT || 
+              activity.getActivity() == ActivityType.MONEYTRANSFER ){
+
+                preparedStatementtransaction.setString(1, activity.getActivityid());
+
+                preparedStatementtransaction.setInt(2, activity.getAccountfrom());
+
+                if (activity.getAccountto() == 0) {
+                    preparedStatementtransaction.setNull(3, java.sql.Types.INTEGER);
+                } else{
+                    preparedStatementtransaction.setInt(3, activity.getAccountto());
+                }
+
+                preparedStatementtransaction.setInt(4, (int)activity.getAmount());
+            
+                preparedStatementtransaction.setTimestamp(5, activity.getDate()); 
+
+                preparedStatementtransaction.setString(6, activity.getActivity().name());
+
+                int val = preparedStatementtransaction.executeUpdate();
+                return val != 0;
+
+            }
 
         } catch (SQLException e) {
             e.printStackTrace(); 
@@ -76,10 +128,11 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public User getUser(int userid) {
-        String query = "SELECT * FROM users WHERE userid = ?";
+        //String query = "SELECT * FROM users WHERE userid = ?";
 
+        String user = "SELECT u.userid, u.encryptedpassword, u.name, u.role, u.mobilenumber, u.aadhaar, a.accountno, a.balance FROM userdetails u LEFT JOIN accountdetails a ON u.userid = a.userid where u.userid = ?";
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(user)) {
 
             preparedStatement.setInt(1, userid);
             ResultSet result = preparedStatement.executeQuery();
@@ -92,8 +145,8 @@ public class DatabaseStorage implements Storage {
                 RoleType.valueOf(result.getString("role")),
                 result.getInt("accountno"),
                 result.getInt("balance"),
-                String.valueOf(result.getLong("mobilenumber")),
-                String.valueOf(result.getLong("Aadhaar")));
+                result.getLong("mobilenumber"),
+                result.getLong("aadhaar"));
             }
 
         } catch (SQLException e) {
@@ -104,13 +157,13 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean updateUser(User user) {
-        String query = "UPDATE users SET balance = ? WHERE userid = ?";
+        String query = "UPDATE accountdetails SET balance = ? WHERE accountno = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, (int) user.getBalance());
-            preparedStatement.setInt(2, user.getUserid());
+            preparedStatement.setInt(2, user.getAccountno());
 
             int n = preparedStatement.executeUpdate();
 
@@ -124,13 +177,13 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean updateProfile(User user) {
-        String query = "UPDATE users SET mobilenumber = ?, aadhaar = ? WHERE userid = ?";
+        String query = "UPDATE userdetails SET mobilenumber = ?, aadhaar = ? WHERE userid = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setLong(1, Long.parseLong(user.getMobilenumber()));
-            preparedStatement.setLong(2, Long.parseLong(user.getAadhaar()));
+            preparedStatement.setLong(1, user.getMobilenumber());
+            preparedStatement.setLong(2, user.getAadhaar());
             preparedStatement.setInt(3, user.getUserid());
 
             int n = preparedStatement.executeUpdate();
@@ -148,27 +201,24 @@ public class DatabaseStorage implements Storage {
 
         List<Activity> activities = new ArrayList<>();
 
-        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?) ";
+        String query = "SELECT * FROM transactiondetails WHERE accountfrom = ? OR accountto = ? ORDER BY date DESC";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                System.out.println("\n\n\n\n\n\n\n\n\n"+user.toString());
 
-            preparedStatement.setInt(1, user.getUserid());
-            preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
-            preparedStatement.setString(3, "WITHDRAW");
-            preparedStatement.setString(4, "DEPOSIT");
-            preparedStatement.setString(5, "MONEYTRANSFER");
+            preparedStatement.setInt(1, user.getAccountno());
+            preparedStatement.setInt(2, user.getAccountno());
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {
                 Activity activity = new Activity(
-                result.getString("activityid"), 
-                result.getInt("userid"), 
+                result.getString("transactionid"), 
                 result.getInt("accountfrom"),
                 result.getInt("accountto"),
                 result.getInt("amount"),
-                convertDate(result.getString("date")),
-                ActivityType.valueOf(result.getString("activity")));
+                result.getTimestamp("date"),
+                ActivityType.valueOf(result.getString("transaction")));
                 activities.add(activity);
             }
         } catch (SQLException e) {
@@ -182,28 +232,20 @@ public class DatabaseStorage implements Storage {
 
         List<Activity> activities = new ArrayList<>();
 
-        String query = "SELECT * FROM activity WHERE (userid = ? OR accountto = ?) AND activity IN (?, ?, ?, ?, ?) ";
+        String query = "SELECT * FROM activitydetails WHERE userid = ? ORDER BY date DESC";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, user.getUserid());
-            preparedStatement.setInt(2, Integer.parseInt(user.getUserid()+"0"+user.getUserid()));
-            preparedStatement.setString(3, "ACCOUNTOPEN");
-            preparedStatement.setString(4, "LOGIN");
-            preparedStatement.setString(5, "LOGOUT");
-            preparedStatement.setString(6, "GETNCUSTOMERS");
-            preparedStatement.setString(7, "UPDATEPROFILE");
             ResultSet result = preparedStatement.executeQuery();
 
             while(result.next()) {
                 Activity activity = new Activity(
                 result.getString("activityid"), 
                 result.getInt("userid"), 
-                result.getInt("accountfrom"),
-                result.getInt("accountto"),
-                result.getInt("amount"),
-                convertDate(result.getString("date")),
+                0,0,0,
+                result.getTimestamp("date"),
                 ActivityType.valueOf(result.getString("activity")));
                 activities.add(activity);
             }
@@ -218,8 +260,9 @@ public class DatabaseStorage implements Storage {
 
         List<User> users = new ArrayList<>();
 
-        String query = "SELECT * FROM users WHERE role = 'CUSTOMER'  ORDER BY balance DESC LIMIT ?";
+        //String query = "SELECT * FROM users WHERE role = 'CUSTOMER'  ORDER BY balance DESC LIMIT ?";
 
+        String query = "SELECT u.userid, u.name, a.accountno, a.balance FROM userdetails u JOIN accountdetails a ON u.userid = a.userid ORDER BY a.balance desc LIMIT ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
@@ -231,12 +274,10 @@ public class DatabaseStorage implements Storage {
                 User user = new User(
                     result.getInt("userid"), 
                     result.getString("name"), 
-                    result.getString("encryptedpassword"),
-                    RoleType.valueOf(result.getString("role")),
+                    null, null,
                     result.getInt("accountno"),
                     result.getInt("balance"),
-                    String.valueOf(result.getLong("mobilenumber")),
-                    String.valueOf(result.getLong("aadhaar")));
+                    0,0);
 
                     users.add(user);
                 
@@ -247,23 +288,23 @@ public class DatabaseStorage implements Storage {
         return users;
     }
 
-    private static String getTimeStamp(Date date){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String mysqlDateTime = sdf.format(date); // Convert to MySQL format
-        return mysqlDateTime; // Example: 2025-03-19 18:07:18
-    }
+    // private static String getTimeStamp(Date date){
+    //     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //     String mysqlDateTime = sdf.format(date); // Convert to MySQL format
+    //     return mysqlDateTime; // Example: 2025-03-19 18:07:18
+    // }
 
-    private static Date convertDate(String dateTime) {
+    // private static Date convertDate(String dateTime) {
         
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         
-        try {
-            Date date = sdf.parse(dateTime); // Convert back to Date
-            return date; // Output: Wed Mar 19 18:07:18 IST 2025
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    //     try {
+    //         Date date = sdf.parse(dateTime); // Convert back to Date
+    //         return date; // Output: Wed Mar 19 18:07:18 IST 2025
+    //     } catch (ParseException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return null;
+    // }
     
 }

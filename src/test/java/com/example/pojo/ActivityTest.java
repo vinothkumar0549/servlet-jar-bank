@@ -2,6 +2,9 @@ package com.example.pojo;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import com.example.util.ActivityType;
 
@@ -9,7 +12,8 @@ class ActivityTest {
 
     @Test
     void testActivityConstructorAndGetters() {
-        Date date = new Date();
+        
+        Timestamp date = Timestamp.valueOf(LocalDateTime.now());
 
         // Creating Activity Object
         Activity activity = new Activity("ACT123", 101, 123456, 654321, 5000.0, date, ActivityType.DEPOSIT);
@@ -27,7 +31,7 @@ class ActivityTest {
     @Test
     void testSetters() {
         Activity activity = new Activity(null, 0, 0, 0, 0.0, null, null);
-        Date date = new Date();
+        Timestamp date = Timestamp.valueOf(LocalDateTime.now());
 
         // Setting values using setters
         activity.setActivityid("ACT456");
@@ -50,7 +54,7 @@ class ActivityTest {
 
     @Test
     void testToStringMethod() {
-        Date date = new Date();
+        Timestamp date = Timestamp.valueOf(LocalDateTime.now());
         Activity activity = new Activity("ACT123", 101, 123456, 654321, 5000.0, date, ActivityType.DEPOSIT);
 
         String expectedOutput = String.format("%-45s%-20s%-20s%-20s%-20s%-30s%-20s%n", 

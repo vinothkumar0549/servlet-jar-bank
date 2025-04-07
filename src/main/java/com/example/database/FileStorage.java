@@ -14,6 +14,7 @@ import java.util.PriorityQueue;
 
 import com.example.pojo.*;
 import com.example.util.*;
+import com.mysql.cj.protocol.ExportControlled;
 
 public class FileStorage implements Storage {
     private final static String userpath = "C:/Users/Administrator/Desktop/servlet/ServletApp/src/main/java/com/example/files/user.txt";
@@ -55,7 +56,7 @@ public class FileStorage implements Storage {
             while ((line = bufferedReader.readLine()) != null) { 
                 if(line.startsWith(String.valueOf(userid))){
                     String[] userdata = line.split("\\s+");
-                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), userdata[6],userdata[7]);
+                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]),Long.parseLong(userdata[7]));
                     return user;
                 }
             }
@@ -101,10 +102,10 @@ public class FileStorage implements Storage {
                     String[] activitydata = line.split("\\s+");
                     if(Integer.valueOf(activitydata[1]) == user.getUserid()){
                         try {
-                            activities.add(new Activity(activitydata[0], Integer.valueOf(activitydata[1]), Integer.valueOf(activitydata[2]), Integer.valueOf(activitydata[3]), Double.parseDouble(activitydata[4]), sdf.parse(String.join(" ", java.util.Arrays.copyOfRange(activitydata, 5, 10))), ActivityType.valueOf(activitydata[activitydata.length-1])));
+                            //activities.add(new Activity(activitydata[0], Integer.valueOf(activitydata[1]), Integer.valueOf(activitydata[2]), Integer.valueOf(activitydata[3]), Double.parseDouble(activitydata[4]), sdf.parse(String.join(" ", java.util.Arrays.copyOfRange(activitydata, 5, 10))), ActivityType.valueOf(activitydata[activitydata.length-1])));
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
-                        } catch (ParseException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -114,10 +115,11 @@ public class FileStorage implements Storage {
                     String[] activitydata = line.split("\\s+");
                     if(Integer.parseInt(activitydata[1]) == user.getUserid() || Integer.valueOf(activitydata[2]) == user.getAccountno() || Integer.valueOf(activitydata[3]) == user.getAccountno()){
                         try {
-                            activities.add(new Activity(activitydata[0], Integer.valueOf(activitydata[1]), Integer.valueOf(activitydata[2]), Integer.valueOf(activitydata[3]), Double.parseDouble(activitydata[4]), sdf.parse(String.join(" ", java.util.Arrays.copyOfRange(activitydata, 5, 10))), ActivityType.valueOf(activitydata[activitydata.length-1])));
+                            System.out.println("INprogress");
+                            //activities.add(new Activity(activitydata[0], Integer.valueOf(activitydata[1]), Integer.valueOf(activitydata[2]), Integer.valueOf(activitydata[3]), Double.parseDouble(activitydata[4]), sdf.parse(String.join(" ", java.util.Arrays.copyOfRange(activitydata, 5, 10))), ActivityType.valueOf(activitydata[activitydata.length-1])));
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
-                        } catch (ParseException e) {
+                        } catch(Exception e){
                             e.printStackTrace();
                         }
                     }
@@ -139,7 +141,7 @@ public class FileStorage implements Storage {
             String line;
             while ((line = bufferedreader.readLine()) != null) {
                 String[] userdata = line.split("\\s+");
-                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), userdata[6], userdata[7]);
+                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]), Long.parseLong(userdata[7]));
     
                 if (user.getRole() == RoleType.ADMIN) {
                     continue;
@@ -174,6 +176,12 @@ public class FileStorage implements Storage {
     public boolean updateProfile(User user) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateProfile'");
+    }
+
+    @Override
+    public boolean writeTransaction(Activity activity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'writeTransaction'");
     }
     
 }

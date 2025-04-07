@@ -10,6 +10,8 @@ public interface Storage {
 
     public boolean writeActivity(Activity activity);
 
+    public boolean writeTransaction(Activity activity);
+
     public User getUser(int userid);
 
     public boolean updateUser(User user);
@@ -21,5 +23,6 @@ public interface Storage {
     public List<User> TopNBalance(int n);
 
     public boolean updateProfile(User user);
+
     
 }

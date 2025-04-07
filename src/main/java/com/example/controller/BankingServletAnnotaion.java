@@ -124,7 +124,6 @@ public class BankingServletAnnotaion {
 
         } catch(RuntimeException e){
             return Response.status(Response.Status.CONFLICT).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
-
         } catch(Exception e){
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
 

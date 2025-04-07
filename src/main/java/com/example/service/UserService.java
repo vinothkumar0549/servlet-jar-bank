@@ -1,6 +1,10 @@
 package com.example.service;
 
 import java.util.*;
+
+import java.time.LocalDateTime;
+import java.sql.Timestamp;
+
 import com.example.database.*;
 import com.example.pojo.*;
 import com.example.util.*;
@@ -26,8 +30,7 @@ public class UserService {
             user.setBalance(10000.00);
         }
         if(storage.writeUser(user)){
-            //System.out.println("Write");
-            Activity activity = new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, user.getBalance(), new Date(), ActivityType.ACCOUNTOPEN);
+            Activity activity = new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, user.getBalance(), Timestamp.valueOf(LocalDateTime.now()), ActivityType.ACCOUNTOPEN);
             if(storage.writeActivity(activity)){
                 return user.getUserid();
             } else {
@@ -43,17 +46,17 @@ public class UserService {
         if(user == null){
             throw new IllegalArgumentException("User not found");
         }
+
         if(!user.getEncryptedpassword().equals(encryptpassword)){
             throw new SecurityException("Incorrect password");
         }
-        if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.LOGIN))){
+        if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.LOGIN))){
             return user;
         }
         throw new RuntimeException("Failed to log login activity");
     }
 
     public boolean withdraw(User user, int amount) {
-
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -72,7 +75,7 @@ public class UserService {
         }
         user.setBalance(user.getBalance() - amount);
         if(storage.updateUser(user)) {
-            if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, new Date(), ActivityType.WITHDRAW))){
+            if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.WITHDRAW))){
                 return true;
             }
             throw new RuntimeException("Failed to log withdrawal activity");
@@ -95,7 +98,8 @@ public class UserService {
         
         user.setBalance(user.getBalance() + amount);
         if(storage.updateUser(user)) {
-            if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, new Date(), ActivityType.DEPOSIT))){
+
+            if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.DEPOSIT))){
                 return true;
             }
             throw new RuntimeException("Failed to Update Activity");
@@ -122,10 +126,12 @@ public class UserService {
         if(receiver == null || receiver.getRole() == RoleType.ADMIN){
             throw new IllegalArgumentException("Receiver account not valid");
         }
+        System.out.println("\n\n\n\n\n useraccount"+user.toString() +" "+user.getAccountno());
+        System.out.println("\n\n\n\n\n receiver account"+receiver.toString()+" "+receiver.getAccountno());
         user.setBalance(user.getBalance() - amount);
         receiver.setBalance(receiver.getBalance() + amount);
         if(storage.updateUser(user) && storage.updateUser(receiver)){
-            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), receiver.getAccountno(), amount, new Date(), ActivityType.MONEYTRANSFER));
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), receiver.getAccountno(), amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.MONEYTRANSFER));
             return true;
         }
         throw new RuntimeException("Failed to update user balances");
@@ -134,7 +140,7 @@ public class UserService {
 
     public boolean logout(User user) {
         if(user != null){
-            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.LOGOUT));
+            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.LOGOUT));
             return true;
         }
         throw new IllegalArgumentException("Invalid user for logout");
@@ -183,16 +189,16 @@ public class UserService {
         }
 
         // Update only the changed fields
-        if (updateuser.getMobilenumber() != null) {
+        if (updateuser.getMobilenumber() != 0) {
             user.setMobilenumber(updateuser.getMobilenumber());
         }
-        if (updateuser.getAadhaar() != null) {
+        if (updateuser.getAadhaar() != 0) {
             user.setAadhaar(updateuser.getAadhaar());
         }
 
         // Save updated user back to storage
         if(storage.updateProfile(user)){
-            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.UPDATEPROFILE));
+            storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.UPDATEPROFILE));
             return true;
         }
         throw new RuntimeException("Failed to update user balances");
@@ -215,7 +221,7 @@ public class UserService {
             throw new RuntimeException("No customer data available");
         }
 
-        if(! storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, new Date(), ActivityType.GETNCUSTOMERS))){
+        if(! storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), 0, 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.GETNCUSTOMERS))){
             throw new RuntimeException("Activity Not Strored");
         }
 

@@ -76,8 +76,8 @@ public class BankingServlet extends HttpServlet {
     private String registerUser(JSONObject requestBody, HttpServletResponse response) throws IOException {
         String name = requestBody.getString("name");
         String password = encrypt(requestBody.getString("password"), 1);
-        String mobilenumber = requestBody.getString("mobilenumber");
-        String aadhaar = requestBody.getString("aadhaar");
+        long mobilenumber = requestBody.getLong("mobilenumber");
+        long aadhaar = requestBody.getLong("aadhaar");
         RoleType usertype = null;
         //String retypepassword = requestBody.getString("retypepassword");
         
