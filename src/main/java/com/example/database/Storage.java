@@ -24,5 +24,7 @@ public interface Storage {
 
     public boolean updateProfile(User user);
 
+    public boolean changepassword(User user);
+
     
 }

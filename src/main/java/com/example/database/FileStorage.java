@@ -56,7 +56,7 @@ public class FileStorage implements Storage {
             while ((line = bufferedReader.readLine()) != null) { 
                 if(line.startsWith(String.valueOf(userid))){
                     String[] userdata = line.split("\\s+");
-                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]),Long.parseLong(userdata[7]));
+                    User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]),Long.parseLong(userdata[7]), Integer.parseInt(userdata[8]));
                     return user;
                 }
             }
@@ -141,7 +141,7 @@ public class FileStorage implements Storage {
             String line;
             while ((line = bufferedreader.readLine()) != null) {
                 String[] userdata = line.split("\\s+");
-                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]), Long.parseLong(userdata[7]));
+                User user = new User(Integer.valueOf(userdata[0]), userdata[1], userdata[2], RoleType.valueOf(userdata[3]), Integer.valueOf(userdata[4]), Double.parseDouble(userdata[5]), Long.parseLong(userdata[6]), Long.parseLong(userdata[7]), Integer.parseInt(userdata[8]));
     
                 if (user.getRole() == RoleType.ADMIN) {
                     continue;
@@ -182,6 +182,12 @@ public class FileStorage implements Storage {
     public boolean writeTransaction(Activity activity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'writeTransaction'");
+    }
+
+    @Override
+    public boolean changepassword(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'changepassword'");
     }
     
 }

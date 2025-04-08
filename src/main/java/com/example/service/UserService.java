@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 import com.example.database.*;
 import com.example.pojo.*;
+import com.example.security.SecurityUtil;
 import com.example.util.*;
 
 public class UserService {
@@ -74,8 +75,13 @@ public class UserService {
             throw new IllegalStateException("Insufficient balance");
         }
         user.setBalance(user.getBalance() - amount);
+        user.setTransactioncount(user.getTransactioncount()+1);
+        if(checkbankcharges(user)){  // check the bank charges...
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+        } 
         if(storage.updateUser(user)) {
             if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.WITHDRAW))){
+                System.out.println("\n\n\n\n\n\n\n\n\n\n\n  Transaction count "+user.getTransactioncount());
                 return true;
             }
             throw new RuntimeException("Failed to log withdrawal activity");
@@ -97,9 +103,14 @@ public class UserService {
         }
         
         user.setBalance(user.getBalance() + amount);
+        user.setTransactioncount(user.getTransactioncount()+1);
+        if(checkbankcharges(user)){  // check the bank charges...
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+        } 
         if(storage.updateUser(user)) {
 
             if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.DEPOSIT))){
+                System.out.println("\n\n\n\n\n\n\n\n\n\n\n  Transaction count "+user.getTransactioncount());
                 return true;
             }
             throw new RuntimeException("Failed to Update Activity");
@@ -130,9 +141,16 @@ public class UserService {
         System.out.println("\n\n\n\n\n receiver account"+receiver.toString()+" "+receiver.getAccountno());
         user.setBalance(user.getBalance() - amount);
         receiver.setBalance(receiver.getBalance() + amount);
+        user.setTransactioncount(user.getTransactioncount()+1);
+        if(checkbankcharges(user)){  // check the bank charges...
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+        }
         if(storage.updateUser(user) && storage.updateUser(receiver)){
-            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), receiver.getAccountno(), amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.MONEYTRANSFER));
-            return true;
+            if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), receiver.getAccountno(), amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.MONEYTRANSFER))){
+                System.out.println("\n\n\n\n\n\n\n\n\n\n\n  Transaction count "+user.getTransactioncount());
+                return true;
+            }
+            throw new RuntimeException("Failed to Update Activity");
         }
         throw new RuntimeException("Failed to update user balances");
         
@@ -232,6 +250,37 @@ public class UserService {
         // }
     
         return topNBalance;
+    }
+
+    public boolean checkchangepassword(User user){
+
+        if(user.getTransactioncount() % 5 == 0){
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean checkbankcharges(User user){
+        if(user.getTransactioncount() % 3 == 0){
+            user.setBalance(user.getBalance() - 10);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean changepassword(User user, String oldpassword, String newpassword){
+        if(user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        user.setEncryptedpassword(SecurityUtil.encrypt(newpassword, 1));
+        if(storage.changepassword(user)) {
+            if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.CHANGEPASSWORD))){
+                return true;
+            }
+            throw new RuntimeException("Failed to log the activity");
+        }
+        throw new RuntimeException("Failed to update the user");
     }
     
 }

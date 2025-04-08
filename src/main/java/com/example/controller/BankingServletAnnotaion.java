@@ -114,7 +114,8 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.withdraw(user, amount);
-            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
+            boolean changepassword = userservice.checkchangepassword(user);
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\", \"transactioncount\":"+ changepassword+"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -155,7 +156,8 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.deposit(user, amount);
-            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
+            boolean changepassword = userservice.checkchangepassword(user);
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\", \"transactioncount\":"+ changepassword+"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -195,7 +197,8 @@ public class BankingServletAnnotaion {
 
         try{
             userservice.moneytransfer(user, receiverid, amount);
-            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\"}").build();
+            boolean changepassword = userservice.checkchangepassword(user);
+            return Response.status(Response.Status.OK).entity("{\"balance\": \"" + user.getBalance() + "\", \"transactioncount\":"+ changepassword+"}").build();
 
         } catch(IllegalArgumentException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
@@ -421,6 +424,42 @@ public class BankingServletAnnotaion {
         // }
 
         return user;
+    }
+
+    @POST
+    @Path("/changepassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changepassword(String  reqeustBody, @Context HttpServletRequest request) {
+
+        JSONObject jsonObject = new JSONObject(reqeustBody);
+
+        int userid = Integer.parseInt(jsonObject.getString("userid"));
+        String oldpassword = SecurityUtil.encrypt(jsonObject.getString("oldpassword"), 1);
+
+        String newpassword = jsonObject.getString("newpassword");
+
+        User user;
+
+        try{
+            user = validate(userid, oldpassword);
+        }catch(Exception e){
+            return Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+        }
+
+        try{
+            userservice.changepassword(user,oldpassword, newpassword);
+            return Response.status(Response.Status.OK).entity("{\"newpassword\": \""+ newpassword +"\"}").build();
+
+        } catch(IllegalArgumentException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        } catch(RuntimeException e){
+            return Response.status(Response.Status.CONFLICT).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
+
+        }
     }
 
 }

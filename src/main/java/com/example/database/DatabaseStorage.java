@@ -57,7 +57,7 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean writeActivity(Activity activity) {
-        System.out.println(activity.toString());
+        System.out.println("\n\n\n\n\n\n\n\n\n"+activity.toString());
         String activityquery = "INSERT INTO activitydetails (activityid, userid, date, activity) VALUES (?,?,?,?)";
         try (Connection connection = DatabaseConnection.getConnection();
             PreparedStatement preparedStatementactivity = connection.prepareStatement(activityquery);) {
@@ -67,7 +67,8 @@ public class DatabaseStorage implements Storage {
               activity.getActivity() == ActivityType.LOGIN || 
               activity.getActivity() == ActivityType.LOGOUT ||
               activity.getActivity() == ActivityType.GETNCUSTOMERS ||
-              activity.getActivity() == ActivityType.UPDATEPROFILE){
+              activity.getActivity() == ActivityType.UPDATEPROFILE ||
+              activity.getActivity() == ActivityType.CHANGEPASSWORD){
 
                 preparedStatementactivity.setString(1, activity.getActivityid());
                 preparedStatementactivity.setInt(2, activity.getUserid());
@@ -97,7 +98,8 @@ public class DatabaseStorage implements Storage {
 
             if(activity.getActivity() == ActivityType.WITHDRAW || 
               activity.getActivity() == ActivityType.DEPOSIT || 
-              activity.getActivity() == ActivityType.MONEYTRANSFER ){
+              activity.getActivity() == ActivityType.MONEYTRANSFER ||
+              activity.getActivity() == ActivityType.BANKCHARGES){
 
                 preparedStatementtransaction.setString(1, activity.getActivityid());
 
@@ -130,7 +132,7 @@ public class DatabaseStorage implements Storage {
     public User getUser(int userid) {
         //String query = "SELECT * FROM users WHERE userid = ?";
 
-        String user = "SELECT u.userid, u.encryptedpassword, u.name, u.role, u.mobilenumber, u.aadhaar, a.accountno, a.balance FROM userdetails u LEFT JOIN accountdetails a ON u.userid = a.userid where u.userid = ?";
+        String user = "SELECT u.userid, u.encryptedpassword, u.name, u.role, u.mobilenumber, u.aadhaar, a.accountno, a.balance, a.transactioncount FROM userdetails u LEFT JOIN accountdetails a ON u.userid = a.userid where u.userid = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(user)) {
 
@@ -146,7 +148,8 @@ public class DatabaseStorage implements Storage {
                 result.getInt("accountno"),
                 result.getInt("balance"),
                 result.getLong("mobilenumber"),
-                result.getLong("aadhaar"));
+                result.getLong("aadhaar"),
+                result.getInt("transactioncount"));
             }
 
         } catch (SQLException e) {
@@ -157,13 +160,14 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean updateUser(User user) {
-        String query = "UPDATE accountdetails SET balance = ? WHERE accountno = ?";
+        String query = "UPDATE accountdetails SET balance = ?, transactioncount = ? WHERE accountno = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, (int) user.getBalance());
-            preparedStatement.setInt(2, user.getAccountno());
+            preparedStatement.setInt(2, user.getTransactioncount());
+            preparedStatement.setInt(3, user.getAccountno());
 
             int n = preparedStatement.executeUpdate();
 
@@ -277,7 +281,7 @@ public class DatabaseStorage implements Storage {
                     null, null,
                     result.getInt("accountno"),
                     result.getInt("balance"),
-                    0,0);
+                    0,0,0);
 
                     users.add(user);
                 
@@ -286,6 +290,27 @@ public class DatabaseStorage implements Storage {
             e.printStackTrace(); 
         }
         return users;
+    }
+
+
+    @Override
+    public boolean changepassword(User user) {
+        String query = "UPDATE userdetails SET encryptedpassword = ? WHERE userid = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, user.getEncryptedpassword());
+            preparedStatement.setInt(2, user.getUserid());
+
+            int n = preparedStatement.executeUpdate();
+
+            return n== 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return false;
     }
 
     // private static String getTimeStamp(Date date){
