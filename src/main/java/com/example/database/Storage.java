@@ -26,5 +26,7 @@ public interface Storage {
 
     public boolean changepassword(User user);
 
+    public List<String> getPasswordHistory(User user);
+
     
 }

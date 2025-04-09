@@ -6,6 +6,7 @@ com\example\AppConfig.class
 com\example\MyServlet.class
 com\example\util\ActivityType.class
 com\example\util\DatabaseConnection.class
+com\example\pojo\PasswordHistory.class
 com\example\database\Storage.class
 com\example\service\UserService.class
 com\example\BankingApplication.class

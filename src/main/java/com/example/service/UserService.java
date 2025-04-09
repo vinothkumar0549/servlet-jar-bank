@@ -77,7 +77,7 @@ public class UserService {
         user.setBalance(user.getBalance() - amount);
         user.setTransactioncount(user.getTransactioncount()+1);
         if(checkbankcharges(user)){  // check the bank charges...
-            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, 10, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
         } 
         if(storage.updateUser(user)) {
             if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.WITHDRAW))){
@@ -105,7 +105,7 @@ public class UserService {
         user.setBalance(user.getBalance() + amount);
         user.setTransactioncount(user.getTransactioncount()+1);
         if(checkbankcharges(user)){  // check the bank charges...
-            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, 10, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
         } 
         if(storage.updateUser(user)) {
 
@@ -143,7 +143,7 @@ public class UserService {
         receiver.setBalance(receiver.getBalance() + amount);
         user.setTransactioncount(user.getTransactioncount()+1);
         if(checkbankcharges(user)){  // check the bank charges...
-            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
+            storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, 10, Timestamp.valueOf(LocalDateTime.now()), ActivityType.BANKCHARGES));
         }
         if(storage.updateUser(user) && storage.updateUser(receiver)){
             if(storage.writeTransaction(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), receiver.getAccountno(), amount, Timestamp.valueOf(LocalDateTime.now()), ActivityType.MONEYTRANSFER))){
@@ -273,7 +273,24 @@ public class UserService {
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
-        user.setEncryptedpassword(SecurityUtil.encrypt(newpassword, 1));
+        if(oldpassword.equals(newpassword)){
+            throw new IllegalArgumentException("Old and New Password are Same");
+        }
+        List<String> passwordhistory = storage.getPasswordHistory(user);
+
+        // System.out.println("\n\n\n\n\n\n\n\n\n\n      Change Password  \n\n\n\n\n\n\n\n\n\n\n\n");
+        // System.out.println(passwordhistory.getPassword1() +" "+ newpassword);
+        // System.out.println(passwordhistory.getPassword2() +" "+ newpassword);
+        // System.out.println(passwordhistory.getPassword3() +" "+ newpassword);
+
+        newpassword = SecurityUtil.encrypt(newpassword, 1);
+        for(String oldpasswords: passwordhistory){
+            if(oldpasswords.equals(newpassword)){
+                throw new IllegalArgumentException("Old passwords are Match");
+            }
+        }
+
+        user.setEncryptedpassword(newpassword);
         if(storage.changepassword(user)) {
             if(storage.writeActivity(new Activity(UUID.randomUUID().toString().replace("-", ""), user.getUserid(), user.getAccountno(), 0, 0, Timestamp.valueOf(LocalDateTime.now()), ActivityType.CHANGEPASSWORD))){
                 return true;

@@ -1,6 +1,8 @@
 package com.example.database;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.example.pojo.Activity;
+import com.example.pojo.PasswordHistory;
 import com.example.pojo.User;
 import com.example.util.ActivityType;
 import com.example.util.DatabaseConnection;
@@ -295,6 +298,7 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public boolean changepassword(User user) {
+        
         String query = "UPDATE userdetails SET encryptedpassword = ? WHERE userid = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -311,6 +315,32 @@ public class DatabaseStorage implements Storage {
             e.printStackTrace(); 
         }
         return false;
+    }
+
+
+    @Override
+    public List<String> getPasswordHistory(User user) {
+        String query = "SELECT oldpassword FROM passwordhistorydetails WHERE userid = ? ORDER BY id DESC LIMIT ?";
+
+        try (
+            Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query)
+        ) {
+            stmt.setInt(1, user.getUserid());
+            stmt.setInt(2, 3);
+
+            ResultSet rs = stmt.executeQuery();
+
+            List<String> oldpasswords = new ArrayList<>();
+            while (rs.next()) {
+                oldpasswords.add(rs.getString("oldpassword"));
+            }
+            return oldpasswords;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // private static String getTimeStamp(Date date){

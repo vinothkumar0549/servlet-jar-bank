@@ -189,5 +189,11 @@ public class FileStorage implements Storage {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'changepassword'");
     }
+
+    @Override
+    public List<String> getPasswordHistory(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPasswordHistory'");
+    }
     
 }
